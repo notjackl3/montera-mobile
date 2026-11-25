@@ -1,25 +1,54 @@
 {
   "expo": {
-    "name": "montera-mobile",
+    "name": "MONTERA",
     "slug": "montera-mobile",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "scheme": "montera",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFEFB"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.montera.mobile",
+      "infoPlist": {
+        "NSCameraUsageDescription": "MONTERA uses the camera to scan IKEA article numbers, flat-pack boxes, manual pages and loose hardware so it can open the right 3D assembly guide."
+      }
     },
     "android": {
+      "package": "com.montera.mobile",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#FFFEFB",
         "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-asset",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "MONTERA uses the camera to scan article numbers, boxes, manual pages and hardware."
+        }
+      ],
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }
