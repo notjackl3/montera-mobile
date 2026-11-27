@@ -53,7 +53,23 @@ export const PRODUCTS: Product[] = [
     baselineMin: 34,
     people: 1,
     model: { gen: 'shelfUnit', w: 80, d: 28, h: 202, shelves: 4, t: 2, plinth: 0 },
-    hardware: [hw('dowel', 8), hw('camlock', 8), hw('camstud', 8), hw('shelfpin', 16), hw('nail', 24), hw('bracket', 1), hw('screw35', 2)],
+    // screw20 and screw25 are the study's look-alike pair: the short ones go
+    // into the top panel, where a 25 mm screw would come through the top.
+    hardware: [
+      hw('dowel', 8),
+      hw('camstud', 8),
+      hw('camlock', 8),
+      hw('shelfpin', 16),
+      hw('nail', 24),
+      hw('bracket', 1),
+      hw('screw20', 2),
+      hw('screw25', 2),
+    ],
+    // Blue dot on the inward face of each mirrored side panel.
+    marks: [
+      { partId: 'side-l', face: '+x', at: [0.6, 0] },
+      { partId: 'side-r', face: '-x', at: [0.6, 0] },
+    ],
     tools: ['Screwdriver', 'Hammer'],
     rating: 4.7,
     reviews: 15230,
@@ -84,6 +100,53 @@ export const PRODUCTS: Product[] = [
     blurb: 'Symmetrical enough that the only real mistake is facing the unfinished edge outward.',
     hasGuide: true,
     source: 'IKEA-Manual',
+  },
+  {
+    id: 'hutten-wine-rack',
+    name: 'HUTTEN',
+    descriptor: 'Wine rack, 9 bottles',
+    category: 'storage',
+    // Representative article number and EAN, like the rest of the catalogue.
+    article: '101.104.94',
+    ean: '7320929201136',
+    // Outside size from ikea.com. Everything inside it is estimated from photos.
+    dims: { w: 33, d: 30, h: 34 },
+    price: 19.99,
+    finish: 'panelOak',
+    finishName: 'Solid wood',
+    tier: 'full',
+    difficulty: 1,
+    // No recorded build times exist for HUTTEN. This is the team's estimate.
+    baselineMin: 12,
+    baselineEstimated: true,
+    people: 1,
+    model: { gen: 'rack', w: 33, d: 30, h: 34, levels: [4.5, 16, 27.5], post: 2.8 },
+    // Letters follow the web guide: A post, B loose rod, C shelf, D screw, E dowel.
+    hardware: [hw('hutScrew', 8), hw('hutDowel', 4)],
+    hardwareLetters: { hutScrew: 'D', hutDowel: 'E' },
+    partNames: {
+      'post-rf': 'Post', 'post-rb': 'Post', 'post-lf': 'Post', 'post-lb': 'Post',
+      'siderod-r1': 'Loose rod', 'siderod-r2': 'Loose rod', 'siderod-l1': 'Loose rod', 'siderod-l2': 'Loose rod',
+      'shelf1-front': 'Shelf (ready-made)', 'shelf2-front': 'Shelf, with wooden pegs', 'shelf3-front': 'Shelf (ready-made)',
+    },
+    partLetters: {
+      'post-rf': 'A', 'post-rb': 'A', 'post-lf': 'A', 'post-lb': 'A',
+      'siderod-r1': 'B', 'siderod-r2': 'B', 'siderod-l1': 'B', 'siderod-l2': 'B',
+      'shelf1-front': 'C', 'shelf2-front': 'C', 'shelf3-front': 'C',
+    },
+    // Blue dot on the outward face of each post: the face with the row of
+    // three small holes, which must end up on the outside of the frame.
+    marks: [
+      { partId: 'post-rf', face: '+x', at: [0.75, 0] },
+      { partId: 'post-rb', face: '+x', at: [0.75, 0] },
+      { partId: 'post-lf', face: '-x', at: [0.75, 0] },
+      { partId: 'post-lb', face: '-x', at: [0.75, 0] },
+    ],
+    tools: ['Allen key (in the bag)'],
+    rating: 4.6,
+    reviews: 2380,
+    blurb: 'Two side frames, three ready-made shelves, eight screws. The pegged shelf goes in the middle.',
+    hasGuide: true,
   },
 
   // ---------------------------------------------------------------- simplified

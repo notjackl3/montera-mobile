@@ -17,7 +17,9 @@ import {
   type ScanMode,
   type ScanResult,
 } from '@/engine/scanners';
+import { fillLetters, lettersFor } from '@/engine/letters';
 import { Button, Chip, ProgressBar, Row } from '@/ui/components';
+import { LetterBadge } from '@/ui/LetterBadge';
 import { HardwareGlyph, Thumb } from '@/ui/Thumb';
 import { colors, radius, space, type } from '@/ui/theme';
 
@@ -348,6 +350,8 @@ function ResultSheet({
   }, []);
 
   const product = BY_ID[result.productId];
+  const letters = lettersFor(product);
+  const guide = getGuide(product.id);
 
   return (
     <Animated.View
@@ -402,8 +406,8 @@ function ResultSheet({
             <Text style={[type.heading, { color: colors.text, marginTop: space(1.5) }]}>
               {getGuide(product.id)?.steps[result.stepIndex]?.title}
             </Text>
-            <Text style={[type.small, { color: colors.textDim, marginTop: space(1.5), lineHeight: 20 }]}>
-              {getGuide(product.id)?.steps[result.stepIndex]?.detail}
+            <Text style={[type.body, { color: colors.textDim, marginTop: space(1.5), lineHeight: 22 }]}>
+              {fillLetters(guide?.steps[result.stepIndex]?.detail ?? '', letters)}
             </Text>
           </View>
         )}
@@ -415,13 +419,15 @@ function ResultSheet({
             if (!h) return null;
             return (
               <Row key={hardwareId} gap={space(3)} style={s.hwLine}>
+                {letters[hardwareId] && <LetterBadge letter={letters[hardwareId]} size={36} />}
                 <View style={s.glyphBox}>
                   <HardwareGlyph glyph={h.glyph} size={24} color={colors.ink} />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={[type.body, { color: colors.text }]}>{h.name}</Text>
-                  <Text style={[type.mono, { color: colors.textFaint }]}>
-                    {h.code} · {Math.round(confidence * 100)}% sure
+                  <Text style={[type.body, { color: colors.text }]}>{h.short ?? h.name}</Text>
+                  <Text style={[type.small, { color: colors.textFaint }]}>
+                    {h.lengthMm ? `${h.lengthMm} mm · ` : ''}
+                    {Math.round(confidence * 100)}% sure
                   </Text>
                 </View>
                 <Text style={[type.title, { color: colors.blue }]}>×{qty}</Text>
@@ -441,7 +447,7 @@ function ResultSheet({
         {/* Runner-up matches */}
         {result.kind === 'product' && result.alternatives.length > 0 && (
           <View style={{ marginTop: space(2) }}>
-            <Text style={[type.micro, { color: colors.textFaint, marginBottom: space(2) }]}>OTHER MATCHES</Text>
+            <Text style={[type.micro, { color: colors.textFaint, marginBottom: space(2) }]}>NOT IT? OTHER MATCHES</Text>
             {result.alternatives.map((alt) => {
               const p = BY_ID[alt.productId];
               if (!p) return null;
@@ -463,29 +469,33 @@ function ResultSheet({
         )}
       </ScrollView>
 
-      {/* Actions */}
-      <View style={{ gap: space(2.5), marginTop: space(3.5) }}>
+      {/* One obvious next action, then a quiet way out. */}
+      <View style={{ gap: space(1), marginTop: space(3.5) }}>
         {result.kind === 'step' ? (
           <Button
-            label={`Open step ${result.stepIndex + 1} in 3D`}
+            label={`Open step ${result.stepIndex + 1}`}
             icon="cube"
-            onPress={() => router.replace(`/build/${product.id}`)}
+            onPress={() => router.replace(`/build/${product.id}?step=${result.stepIndex + 1}`)}
           />
-        ) : product.tier === 'full' ? (
-          <Button label="Start guided assembly" icon="construct" onPress={() => router.replace(`/build/${product.id}`)} />
+        ) : result.kind === 'hardware' ? (
+          <Button
+            label="Open the parts bag"
+            icon="bag-handle-outline"
+            onPress={() => router.replace(`/parts/${product.id}?focus=${result.items[0]?.hardwareId ?? ''}`)}
+          />
+        ) : guide ? (
+          <Button label={`Start building ${product.name}`} icon="construct" onPress={() => router.replace(`/build/${product.id}`)} />
         ) : (
-          <Button label="Open 3D viewer" icon="cube-outline" onPress={() => router.replace(`/viewer/${product.id}`)} />
+          <Button label={`Open ${product.name} in 3D`} icon="cube-outline" onPress={() => router.replace(`/viewer/${product.id}`)} />
         )}
 
-        <Row gap={space(2.5)}>
-          <Button label="Scan again" variant="secondary" icon="refresh" onPress={onRescan} style={{ flex: 1 }} />
-          <Button
-            label="Product"
-            variant="ghost"
-            icon="information-circle-outline"
-            onPress={() => router.replace(`/product/${product.id}`)}
-            style={{ flex: 1 }}
-          />
+        <Row style={{ justifyContent: 'center', gap: space(6) }}>
+          <Pressable onPress={onRescan} hitSlop={6} style={s.textLink}>
+            <Text style={[type.body, { color: colors.blue, textDecorationLine: 'underline' }]}>Scan again</Text>
+          </Pressable>
+          <Pressable onPress={onClose} hitSlop={6} style={s.textLink}>
+            <Text style={[type.body, { color: colors.blue, textDecorationLine: 'underline' }]}>Close</Text>
+          </Pressable>
         </Row>
       </View>
     </Animated.View>
@@ -607,6 +617,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  textLink: { minHeight: 48, justifyContent: 'center' },
   altRow: {
     flexDirection: 'row',
     alignItems: 'center',

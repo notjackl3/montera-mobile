@@ -12,10 +12,13 @@ import { fmtDuration, fmtShort, useApp, type Session } from '@/store/useApp';
 import { Button, Card, Chip, Divider, Empty, Row, SectionHeader, StatTile } from '@/ui/components';
 import { ScreenHeader } from '@/ui/ScreenHeader';
 import { colors, radius, space, type } from '@/ui/theme';
+import { FailAtStep } from '@/ui/Voice';
+import { GUIDES } from '@/data/guides';
 
 export default function StudyMode() {
   const insets = useSafeAreaInsets();
-  const { sessions, resetDemo } = useApp();
+  const { sessions, resetDemo, voice, setVoice } = useApp();
+  const maxSteps = Math.max(...Object.values(GUIDES).map((g) => g.steps.length));
   const [busy, setBusy] = useState(false);
 
   const { paired, paperSessions, digitalSessions, meanPaperSec, meanDigitalSec, deltaPct } =
@@ -166,6 +169,28 @@ export default function StudyMode() {
             ))}
           </Card>
         )}
+      </View>
+
+      {/* Wizard-of-Oz voice */}
+      <View style={{ paddingHorizontal: space(4), marginTop: space(6) }}>
+        <SectionHeader title="Voice (Wizard of Oz)" />
+        <Card>
+          <View style={{ gap: space(3) }}>
+            <Text style={[type.body, { color: colors.text }]}>
+              There is no speech recognition. During a build, long-press the “Hey IKEA” banner, or open Build settings,
+              to fire scripted commands as if they were heard.
+            </Text>
+            <Row style={{ justifyContent: 'space-between' }}>
+              <Text style={[type.heading, { color: colors.text }]}>Show the “Hey IKEA” banner</Text>
+              <Chip
+                label={voice.banner ? 'On' : 'Off'}
+                active={voice.banner}
+                onPress={() => setVoice({ banner: !voice.banner })}
+              />
+            </Row>
+            <FailAtStep stepCount={maxSteps} />
+          </View>
+        </Card>
       </View>
 
       {/* Export + attribution */}

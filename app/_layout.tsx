@@ -38,6 +38,8 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="scanner/[mode]" options={{ animation: 'fade_from_bottom' }} />
           <Stack.Screen name="build/[id]" options={{ animation: 'slide_from_bottom', gestureEnabled: false }} />
+          {/* The web guide swipes between steps itself, so no swipe-back here. */}
+          <Stack.Screen name="guide/[id]" options={{ animation: 'slide_from_bottom', gestureEnabled: false }} />
         </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>

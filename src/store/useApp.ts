@@ -17,9 +17,16 @@ export type Session = {
 
 export type Progress = { step: number; updatedAt: number };
 
+/** A build in the web app's guide (see src/data/webGuides.ts), as reported by the page. */
+export type WebProgress = { step: number; total: number; name: string; updatedAt: number };
+
 type State = {
   /** In-progress builds, keyed by product id. */
   progress: Record<string, Progress>;
+  /** In-progress web-guide builds, keyed by the web app's product id. */
+  webProgress: Record<string, WebProgress>;
+  setWebProgress: (webId: string, p: Omit<WebProgress, 'updatedAt'>) => void;
+  clearWebProgress: (webId: string) => void;
   /** Most recently opened product ids, newest first. */
   recents: string[];
   sessions: Session[];
@@ -34,6 +41,17 @@ type State = {
   recordStep: (index: number, seconds: number) => void;
   finishSession: (completed: boolean, elapsedSec: number) => void;
   discardSession: () => void;
+
+  /**
+   * Points per millimetre, from the bank-card calibration. Undefined until the
+   * user calibrates; real-size drawings are labelled "not to scale" until then.
+   */
+  ptPerMm?: number;
+  calibrate: (ptPerMm: number) => void;
+
+  /** Wizard-of-Oz voice settings, set by the facilitator. */
+  voice: { banner: boolean; failAtStep?: number };
+  setVoice: (v: Partial<State['voice']>) => void;
 
   resetDemo: () => void;
 };
@@ -106,6 +124,20 @@ export const useApp = create<State>((set, get) => ({
   recents: ['billy-bookcase', 'lack-side-table', 'kallax-2x2'],
   sessions: seedSessions(),
   active: undefined,
+  ptPerMm: undefined,
+  voice: { banner: true, failAtStep: undefined },
+
+  webProgress: {},
+  setWebProgress: (webId, p) => set((st) => ({ webProgress: { ...st.webProgress, [webId]: { ...p, updatedAt: now() } } })),
+  clearWebProgress: (webId) =>
+    set((st) => {
+      const next = { ...st.webProgress };
+      delete next[webId];
+      return { webProgress: next };
+    }),
+
+  calibrate: (ptPerMm) => set({ ptPerMm }),
+  setVoice: (v) => set((st) => ({ voice: { ...st.voice, ...v } })),
 
   touchProduct: (productId) =>
     set((st) => ({ recents: [productId, ...st.recents.filter((r) => r !== productId)].slice(0, 8) })),
@@ -153,6 +185,7 @@ export const useApp = create<State>((set, get) => ({
   resetDemo: () =>
     set({
       progress: { 'billy-bookcase': { step: 3, updatedAt: now() - 7_200_000 } },
+      webProgress: {},
       recents: ['billy-bookcase', 'lack-side-table', 'kallax-2x2'],
       sessions: seedSessions(),
       active: undefined,

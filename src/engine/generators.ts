@@ -270,6 +270,62 @@ function stool(s: Extract<ModelSpec, { gen: 'stool' }>, ctx: Ctx): Part[] {
   );
 }
 
+/**
+ * HUTTEN-style wine rack, after IKEA manual AA-49900-4 and the web app's
+ * `scripts/gen-hutten.mjs`. Only the outside size is IKEA's; the post, rail and
+ * rod sections are estimates from product photos.
+ *
+ * Four square posts stand at the corners. Each side frame is its front and back
+ * post joined by two loose rods (near the top and bottom). Each ready-made
+ * shelf is two rails running across, flush with the posts' outer faces, and
+ * four rods running front to back between them.
+ *
+ * Ids: `post-rf` `post-rb` `post-lf` `post-lb`, `siderod-r1..2` `siderod-l1..2`,
+ * `shelf<n>-front` `shelf<n>-back` `shelf<n>-rod1..4` (n counts from the floor).
+ */
+function rack(s: Extract<ModelSpec, { gen: 'rack' }>, ctx: Ctx): Part[] {
+  const { w, d, h, levels } = s;
+  const post = s.post ?? 2.8;
+  const rail = { h: 3, t: 1.6 };
+  const rodR = 0.8;
+  const postX = w / 2 - post / 2;
+  const postZ = d / 2 - post / 2;
+  const railZ = d / 2 - rail.t / 2;
+  const railLen = w - 2 * post;
+  const shelfRodLen = 2 * railZ - rail.t;
+  const sideRodLen = d - 2 * post;
+  const rodXs = [-0.43, -0.146, 0.146, 0.43].map((f) => f * railLen);
+  const sideRodYs = [2.5, h - 2.5];
+  // Cylinders run along their local y; this lays one front to back.
+  const alongZ: [number, number, number] = [Math.PI / 2, 0, 0];
+
+  const parts: Part[] = [];
+  for (const [side, sx] of [['r', 1], ['l', -1]] as const) {
+    const x = sx * postX;
+    const label = side === 'r' ? 'right' : 'left';
+    parts.push(box(`post-${side}f`, `Post, ${label} front`, [post, h, post], [x, h / 2, postZ], ctx.finish, [sx, 0, 0.3]));
+    parts.push(box(`post-${side}b`, `Post, ${label} back`, [post, h, post], [x, h / 2, -postZ], ctx.finish, [sx, 0, -0.3]));
+    sideRodYs.forEach((y, i) =>
+      parts.push({
+        ...cyl(`siderod-${side}${i + 1}`, `Loose rod ${i + 1}`, rodR, sideRodLen, [x, y, 0], ctx.finish, [sx, 0, 0]),
+        rotation: alongZ,
+      }),
+    );
+  }
+  levels.forEach((y, i) => {
+    const n = i + 1;
+    parts.push(box(`shelf${n}-front`, `Shelf ${n} front rail`, [railLen, rail.h, rail.t], [0, y, railZ], ctx.finish, [0, 0.2, 1]));
+    parts.push(box(`shelf${n}-back`, `Shelf ${n} back rail`, [railLen, rail.h, rail.t], [0, y, -railZ], ctx.finish, [0, 0.2, -1]));
+    rodXs.forEach((x, j) =>
+      parts.push({
+        ...cyl(`shelf${n}-rod${j + 1}`, `Shelf ${n} rod ${j + 1}`, rodR, shelfRodLen, [x, y, 0], ctx.finish, [0, 1, 0]),
+        rotation: alongZ,
+      }),
+    );
+  });
+  return parts;
+}
+
 /** Resolve a product's `ModelSpec` into the concrete pieces in its box. */
 export function generateParts(model: ModelSpec, finish: FinishKey): Part[] {
   const ctx: Ctx = { finish };
@@ -294,5 +350,7 @@ export function generateParts(model: ModelSpec, finish: FinishKey): Part[] {
       return wallShelf(model, ctx);
     case 'stool':
       return stool(model, ctx);
+    case 'rack':
+      return rack(model, ctx);
   }
 }

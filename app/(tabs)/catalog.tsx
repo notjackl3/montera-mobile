@@ -38,7 +38,9 @@ export default function Catalog() {
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
     const digits = needle.replace(/\D/g, '');
-    return PRODUCTS.filter((p) => {
+    // Guided builds first: they moved here from the home screen.
+    const ordered = [...PRODUCTS].sort((a, b) => Number(b.tier === 'full') - Number(a.tier === 'full'));
+    return ordered.filter((p) => {
       if (cat !== 'all' && p.category !== cat) return false;
       if (tier !== 'all' && p.tier !== tier) return false;
       if (!needle) return true;

@@ -9,6 +9,8 @@ import {
   type MeshStandardMaterial,
 } from 'three';
 
+import type { OrientationMark } from '@/data/types';
+import { markPose } from '@/engine/marks';
 import type { PartPose } from '@/engine/pose';
 import { colors } from '@/ui/theme';
 
@@ -20,7 +22,16 @@ import { colors } from '@/ui/theme';
  * The face mesh alone reads as a white blob on a white page, so the edge
  * overlay is what actually makes the geometry legible.
  */
-export function PartMesh({ pose, highlight }: { pose: PartPose; highlight: boolean }) {
+export function PartMesh({
+  pose,
+  highlight,
+  marks,
+}: {
+  pose: PartPose;
+  highlight: boolean;
+  /** Orientation stickers on this part, drawn as blue dots. */
+  marks?: OrientationMark[];
+}) {
   const group = useRef<Group>(null);
   const { part } = pose;
 
@@ -90,6 +101,17 @@ export function PartMesh({ pose, highlight }: { pose: PartPose; highlight: boole
       <lineSegments geometry={edges}>
         <lineBasicMaterial color={edgeColor} transparent opacity={pose.opacity} />
       </lineSegments>
+      {/* Stickers only on parts that are really there, not on ghosts. */}
+      {pose.opacity > 0.5 &&
+        marks?.map((m, i) => {
+          const mp = markPose(part, m);
+          return (
+            <mesh key={i} position={mp.offset} rotation={mp.rotation}>
+              <cylinderGeometry args={[mp.radius, mp.radius, 0.12, 24]} />
+              <meshBasicMaterial color={colors.blue} />
+            </mesh>
+          );
+        })}
     </group>
   );
 }

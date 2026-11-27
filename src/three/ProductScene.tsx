@@ -133,7 +133,12 @@ export function ProductScene({
         <CameraRig orbit={orbit} target={target} baseDistance={baseDistance} autoRotate={autoRotate} />
 
         {poses.map((pose) => (
-          <PartMesh key={pose.part.id} pose={pose} highlight={pose.state === 'active'} />
+          <PartMesh
+            key={pose.part.id}
+            pose={pose}
+            highlight={pose.state === 'active'}
+            marks={product.marks?.filter((m) => m.partId === pose.part.id)}
+          />
         ))}
 
         {showCage && <DimensionCage size={bounds.size} center={bounds.center} />}

@@ -7,7 +7,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getGuide, guideSeconds } from '@/data/guides';
 import { HARDWARE } from '@/data/hardware';
 import { getProduct } from '@/data/products';
+import { lettersFor, panelGroups } from '@/engine/letters';
 import { partsFor } from '@/engine/pose';
+import { LetterBadge } from '@/ui/LetterBadge';
 import { useApp } from '@/store/useApp';
 import { Button, Card, Chip, Difficulty, Divider, Empty, Row, SectionHeader, StatTile } from '@/ui/components';
 import { HardwareGlyph } from '@/ui/Thumb';
@@ -30,19 +32,8 @@ export default function ProductDetail() {
 
   const guide = getProduct(id) ? getGuide(id) : undefined;
 
-  const partGroups = useMemo(() => {
-    if (!product) return [];
-    const groups = new Map<string, { name: string; count: number }>();
-    for (const part of partsFor(product)) {
-      // "Leg 1".."Leg 4" collapse into a single "Leg ×4" line, the way the
-      // real parts list in the manual presents them.
-      const key = part.name.replace(/\s+\d+(-\d+)?$/, '').trim();
-      const g = groups.get(key);
-      if (g) g.count += 1;
-      else groups.set(key, { name: key, count: 1 });
-    }
-    return [...groups.values()];
-  }, [product]);
+  const partGroups = useMemo(() => (product ? panelGroups(product) : []), [product]);
+  const letters = useMemo(() => (product ? lettersFor(product) : {}), [product]);
 
   if (!product) {
     return (
@@ -115,8 +106,7 @@ export default function ProductDetail() {
         <View style={{ paddingHorizontal: space(4), marginTop: space(5), gap: space(2.5) }}>
           {product.tier === 'full' ? (
             <Button
-              label={progress ? `Resume at step ${progress.step + 1}` : 'Start guided assembly'
-              }
+              label={progress ? `Resume at step ${progress.step + 1}` : `Start building ${product.name}`}
               icon={progress ? 'play' : 'construct'}
               onPress={() => router.push(`/build/${product.id}`)}
             />
@@ -140,7 +130,11 @@ export default function ProductDetail() {
             <StatTile value={String(pieces)} label="Pieces" />
           </Row>
           <Row gap={space(2.5)} style={{ marginTop: space(2.5) }}>
-            <StatTile value={`${product.baselineMin}m`} label="Typical build" tone={colors.ink} />
+            <StatTile
+              value={`${product.baselineMin}m`}
+              label={product.baselineEstimated ? 'Typical (estimate)' : 'Typical build'}
+              tone={colors.ink}
+            />
             <StatTile value={guideMin ? `${guideMin}m` : '—'} label="Guided est." tone={colors.blue} />
             <StatTile value={product.people === 2 ? 'Two' : 'One'} label="People" />
           </Row>
@@ -174,13 +168,13 @@ export default function ProductDetail() {
 
         {/* Panels */}
         <View style={{ paddingHorizontal: space(4), marginTop: space(6) }}>
-          <SectionHeader title={`Panels and pieces · ${pieces}`} />
+          <SectionHeader title={product.partLetters ? 'Parts' : `Panels and pieces · ${pieces}`} />
           <Card padded={false}>
             {partGroups.map((g, i) => (
               <View key={g.name}>
                 {i > 0 && <Divider />}
-                <Row style={{ padding: space(3.5) }}>
-                  <View style={s.partDot} />
+                <Row style={{ padding: space(3.5) }} gap={space(3)}>
+                  {g.letter ? <LetterBadge letter={g.letter} muted /> : <View style={s.partDot} />}
                   <Text style={[type.body, { color: colors.text, flex: 1 }]}>{g.name}</Text>
                   <Text style={[type.mono, { color: colors.textDim }]}>×{g.count}</Text>
                 </Row>
@@ -191,7 +185,7 @@ export default function ProductDetail() {
 
         {/* Fittings */}
         <View style={{ paddingHorizontal: space(4), marginTop: space(6) }}>
-          <SectionHeader title="Fittings bag" />
+          <SectionHeader title="Fittings bag" action="Actual size" onAction={() => router.push(`/parts/${product.id}`)} />
           <Card padded={false}>
             {product.hardware.map((line, i) => {
               const h = HARDWARE[line.id];
@@ -199,16 +193,21 @@ export default function ProductDetail() {
               return (
                 <View key={line.id}>
                   {i > 0 && <Divider />}
-                  <Row style={{ padding: space(3) }} gap={space(3)}>
+                  <Pressable
+                    onPress={() => router.push(`/parts/${product.id}?focus=${line.id}`)}
+                    style={({ pressed }) => [s.fitRow, pressed && { backgroundColor: colors.surfacePressed }]}
+                  >
+                    {letters[line.id] && <LetterBadge letter={letters[line.id]} />}
                     <View style={s.glyphBox}>
                       <HardwareGlyph glyph={h.glyph} size={24} color={colors.ink} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={[type.body, { color: colors.text }]}>{h.name}</Text>
-                      <Text style={[type.mono, { color: colors.textFaint }]}>{h.code}</Text>
+                      <Text style={[type.body, { color: colors.text }]}>{h.short ?? h.name}</Text>
+                      {h.lengthMm ? <Text style={[type.small, { color: colors.textFaint }]}>{h.lengthMm} mm</Text> : null}
                     </View>
                     <Text style={[type.mono, { color: colors.text }]}>×{line.qty}</Text>
-                  </Row>
+                    <Ionicons name="chevron-forward" size={18} color={colors.ink} />
+                  </Pressable>
                 </View>
               );
             })}
@@ -258,6 +257,7 @@ const s = StyleSheet.create({
     backgroundColor: colors.ink,
     marginRight: space(2),
   },
+  fitRow: { flexDirection: 'row', alignItems: 'center', gap: space(3), padding: space(3), minHeight: 64 },
   glyphBox: {
     width: 40,
     height: 40,

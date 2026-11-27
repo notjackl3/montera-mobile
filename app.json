@@ -45,7 +45,8 @@
           "cameraPermission": "MONTERA uses the camera to scan article numbers, boxes, manual pages and hardware."
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true
