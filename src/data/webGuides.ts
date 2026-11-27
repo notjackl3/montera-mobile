@@ -10,12 +10,18 @@
 /** Override with EXPO_PUBLIC_WEB_URL, e.g. a preview deployment. */
 export const WEB_URL = (process.env.EXPO_PUBLIC_WEB_URL ?? 'https://montera-nine.vercel.app').replace(/\/$/, '');
 
-export type WebGuide = { id: string; name: string; steps: number; study?: boolean };
+export type WebGuide = { id: string; name: string; steps: number; study?: boolean; /** Step titles, for the partway picker. Keep in step with the web app's hutten.json. */ titles?: string[] };
 
 /** The web app's hand-made guides (src/data/products.ts there), the study build first. */
 export const WEB_GUIDES: WebGuide[] = [
   // The study build: the whole rack.
-  { id: 'hutten', name: 'HUTTEN wine rack, 9 bottles', steps: 14, study: true },
+  {
+    id: 'hutten',
+    name: 'HUTTEN wine rack, 9 bottles',
+    steps: 14,
+    study: true,
+    titles: ['Rods into a post', 'Add the second post', 'Rods into a post, again', 'Finish the second frame', 'Stand a shelf on edge', 'Add the middle shelf', 'Add the last shelf', 'Stand the frame against them', 'Screw the frame on', 'Tip it onto the frame', 'Add the second frame', 'Screw it on', 'Stand it up', 'Stacking? Add the dowels'],
+  },
   { id: 'lack', name: 'LACK side table', steps: 4 },
   { id: 'lack-coffee', name: 'LACK coffee table', steps: 8 },
   { id: 'lack-tv', name: 'LACK TV bench', steps: 10 },
@@ -36,8 +42,9 @@ export function webGuideFor(id: string | undefined): WebGuide | undefined {
 }
 
 /** `step` is 0-based; the web app takes a 1-based ?step=. */
-export function guideUrl(webId: string, step = 0): string {
+export function guideUrl(webId: string, step = 0, panel?: 'parts'): string {
   const q = new URLSearchParams({ product: webId, ui: 'mobile', shell: 'expo' });
   if (step > 0) q.set('step', String(step + 1));
+  if (panel) q.set('panel', panel);
   return `${WEB_URL}/?${q.toString()}`;
 }

@@ -157,7 +157,7 @@ export default function Partway() {
                     <Text style={[type.heading, { color: colors.ink }]}>{i + 1}</Text>
                   </View>
                   <Text style={[type.heading, { color: colors.text, flex: 1 }]}>
-                    Step {i + 1}
+                    {web.titles?.[i] ?? `Step ${i + 1}`}
                     {at === i ? ' · where you left off' : ''}
                   </Text>
                   <Ionicons name="chevron-forward" size={22} color={colors.ink} />

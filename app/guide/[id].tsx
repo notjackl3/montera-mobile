@@ -23,7 +23,7 @@ const DIAG = `(function(){try{var w=window;w.ReactNativeWebView.postMessage(JSON
  */
 export default function GuideScreen() {
   useKeepAwake();
-  const { id, step } = useLocalSearchParams<{ id: string; step?: string }>();
+  const { id, step, panel } = useLocalSearchParams<{ id: string; step?: string; panel?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const guide = WEB_GUIDE_BY_ID[id];
@@ -37,8 +37,8 @@ export default function GuideScreen() {
   const uri = useMemo(() => {
     const saved = useApp.getState().webProgress[id]?.step ?? 0;
     const asked = step ? Math.max(0, Number(step) - 1) : saved;
-    return guideUrl(id, asked);
-  }, [id, step]);
+    return guideUrl(id, asked, panel === 'parts' ? 'parts' : undefined);
+  }, [id, step, panel]);
 
   if (!guide) {
     return (

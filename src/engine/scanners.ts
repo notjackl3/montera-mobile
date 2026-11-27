@@ -87,7 +87,8 @@ export const MODES: Record<ScanMode, ModeConfig> = {
 export const MODE_ORDER: ScanMode[] = ['article', 'box', 'manual', 'hardware'];
 
 /** Products a demo is most likely to want to land on. */
-export const DEMO_TARGETS = ['lack-side-table', 'hutten-wine-rack', 'kallax-2x2', 'billy-bookcase', 'malm-dresser'];
+// The study build (HUTTEN) first: an unknown box scanned in the interview resolves to it.
+export const DEMO_TARGETS = ['hutten-wine-rack', 'lack-side-table', 'kallax-2x2', 'billy-bookcase', 'malm-dresser'];
 
 const confidenceJitter = (base: number) => Math.min(0.99, base + (Math.random() * 0.06 - 0.03));
 

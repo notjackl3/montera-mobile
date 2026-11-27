@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getGuide } from '@/data/guides';
 import { HARDWARE } from '@/data/hardware';
 import { BY_ID } from '@/data/products';
+import { webGuideFor } from '@/data/webGuides';
 import {
   DEMO_TARGETS,
   MODES,
@@ -35,6 +36,7 @@ export default function Scanner() {
   const [result, setResult] = useState<ScanResult | null>(null);
   const [targetIdx, setTargetIdx] = useState(0);
   const [scanning, setScanning] = useState(true);
+  const [showDemo, setShowDemo] = useState(false);
 
   const target = DEMO_TARGETS[targetIdx % DEMO_TARGETS.length];
   const sweep = useRef(new Animated.Value(0)).current;
@@ -117,7 +119,10 @@ export default function Scanner() {
         </Pressable>
         <View style={{ flex: 1, alignItems: 'center' }}>
           <Text style={[type.heading, { color: colors.canvas }]}>{cfg.title}</Text>
-          <Chip label={cfg.live ? 'Live decode' : 'Simulated'} tone={cfg.live ? 'success' : 'warn'} />
+          {/* Facilitator only: long-press shows the demo target picker. */}
+          <Pressable onLongPress={() => setShowDemo((v) => !v)} delayLongPress={800} accessibilityLabel="Scanner mode">
+            <Chip label={cfg.live ? 'Live decode' : 'Simulated'} tone={cfg.live ? 'success' : 'warn'} />
+          </Pressable>
         </View>
         <View style={{ width: 38 }} />
       </View>
@@ -150,8 +155,9 @@ export default function Scanner() {
         </View>
       )}
 
-      {/* Demo target picker — keeps a stage demo deterministic. */}
-      {!result && (
+      {/* Demo target picker — keeps a stage demo deterministic. Hidden in interviews: it names the
+          product before the scan ("you don't know what it is"). Long-press the mode chip to show it. */}
+      {!result && showDemo && (
         <View style={[s.demoBar, { bottom: insets.bottom + space(4) }]}>
           <Text style={[type.micro, { color: colors.textFaint, marginBottom: space(2) }]}>
             DEMO WILL RESOLVE TO
@@ -484,7 +490,19 @@ function ResultSheet({
             onPress={() => router.replace(`/parts/${product.id}?focus=${result.items[0]?.hardwareId ?? ''}`)}
           />
         ) : guide ? (
-          <Button label={`Start building ${product.name}`} icon="construct" onPress={() => router.replace(`/build/${product.id}`)} />
+          <>
+            <Button label={`Start building ${product.name}`} icon="construct" onPress={() => router.replace(`/build/${product.id}`)} />
+            {/* Interview task 2: identify the mixed bag of pieces before building. */}
+            <Button
+              label="Identify the parts first"
+              icon="bag-handle-outline"
+              variant="secondary"
+              onPress={() => {
+                const web = webGuideFor(product.id);
+                router.replace(web ? `/guide/${web.id}?panel=parts` : `/parts/${product.id}`);
+              }}
+            />
+          </>
         ) : (
           <Button label={`Open ${product.name} in 3D`} icon="cube-outline" onPress={() => router.replace(`/viewer/${product.id}`)} />
         )}
