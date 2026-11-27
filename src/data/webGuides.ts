@@ -20,7 +20,7 @@ export const WEB_GUIDES: WebGuide[] = [
     name: 'HUTTEN wine rack, 9 bottles',
     steps: 14,
     study: true,
-    titles: ['Rods into a post', 'Add the second post', 'Rods into a post, again', 'Finish the second frame', 'Stand a shelf on edge', 'Add the middle shelf', 'Add the last shelf', 'Stand the frame against them', 'Screw the frame on', 'Tip it onto the frame', 'Add the second frame', 'Screw it on', 'Stand it up', 'Stacking? Add the dowels'],
+    titles: ['Rods into a post', 'Add the second post', 'Start the second frame', 'Finish the second frame', 'Stand a shelf on edge', 'Add the middle shelf', 'Add the last shelf', 'Stand the frame against them', 'Screw the frame on', 'Tip it onto the frame', 'Add the second frame', 'Screw it on', 'Stand it up', 'Stacking? Add the dowels'],
   },
   { id: 'lack', name: 'LACK side table', steps: 4 },
   { id: 'lack-coffee', name: 'LACK coffee table', steps: 8 },
