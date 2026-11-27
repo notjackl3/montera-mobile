@@ -257,7 +257,7 @@ const s = StyleSheet.create({
     backgroundColor: colors.surfaceAlt,
     borderRadius: radius.lg,
   },
-  lead: { fontSize: 18, lineHeight: 26, fontFamily: type.body.fontFamily },
+  lead: { fontSize: 15, lineHeight: 21, fontFamily: type.body.fontFamily },
   sub: { fontSize: 16, lineHeight: 22, fontFamily: type.body.fontFamily },
   guideName: { fontSize: 16, fontFamily: type.body.fontFamily },
   menuBtn: {

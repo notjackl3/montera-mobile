@@ -107,11 +107,11 @@ export const font = {
 } as const;
 
 export const type = {
-  display: { fontSize: 30, fontFamily: font.bold, letterSpacing: -1.1 },
-  title: { fontSize: 22, fontFamily: font.bold, letterSpacing: -0.5 },
-  heading: { fontSize: 17, fontFamily: font.bold, letterSpacing: -0.2 },
-  body: { fontSize: 15, fontFamily: font.regular },
-  small: { fontSize: 13, fontFamily: font.regular },
+  display: { fontSize: 26, fontFamily: font.bold, letterSpacing: -1.1 },
+  title: { fontSize: 19, fontFamily: font.bold, letterSpacing: -0.5 },
+  heading: { fontSize: 15, fontFamily: font.bold, letterSpacing: -0.2 },
+  body: { fontSize: 14, fontFamily: font.regular },
+  small: { fontSize: 12, fontFamily: font.regular },
   micro: { fontSize: 11, fontFamily: font.bold, letterSpacing: 0.6 },
   mono: { fontSize: 13, fontFamily: 'Menlo', letterSpacing: 0.4 },
 } as const;

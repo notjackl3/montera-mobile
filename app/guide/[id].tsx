@@ -1,8 +1,7 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useKeepAwake } from 'expo-keep-awake';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { createElement, useMemo, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 
@@ -11,7 +10,9 @@ import { useApp } from '@/store/useApp';
 import { Button, Empty } from '@/ui/components';
 import { colors, space, type } from '@/ui/theme';
 
-type ProgressMsg = { type: 'montera-progress'; product: string; name: string; step: number; total: number; finished: boolean };
+type ProgressMsg =
+  | { type: 'montera-progress'; product: string; name: string; step: number; total: number; finished: boolean }
+  | { type: 'montera-home' };
 
 /**
  * The build itself: the web app's phone layout (3D step player, parts, checks,
@@ -52,6 +53,10 @@ export default function GuideScreen() {
     } catch {
       return;
     }
+    if (msg?.type === 'montera-home') {
+      leave();
+      return;
+    }
     if (msg?.type !== 'montera-progress' || msg.product !== id) return;
     if (msg.finished) clearWebProgress(id);
     else setWebProgress(id, { step: msg.step, total: msg.total, name: guide.name });
@@ -61,12 +66,8 @@ export default function GuideScreen() {
 
   return (
     <View style={s.fill}>
-      <View style={[s.bar, { paddingTop: insets.top + space(1) }]}>
-        <Pressable onPress={leave} hitSlop={10} style={s.back} accessibilityRole="button" accessibilityLabel="Back to MONTERA home">
-          <Ionicons name="chevron-back" size={22} color={colors.ink} />
-          <Text style={[type.body, { color: colors.ink }]}>Home</Text>
-        </Pressable>
-      </View>
+      {/* Only the status-bar gap: the guide's own top bar has Home (it posts `montera-home`), so there is one bar, not two. */}
+      <View style={{ height: insets.top, backgroundColor: colors.canvas }} />
 
       {failed ? (
         <View style={[s.fill, { padding: space(4), gap: space(3) }]}>
@@ -116,15 +117,5 @@ export default function GuideScreen() {
 
 const s = StyleSheet.create({
   fill: { flex: 1, backgroundColor: colors.canvas },
-  bar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: space(2),
-    paddingBottom: space(1),
-    backgroundColor: colors.canvas,
-    borderBottomWidth: 1,
-    borderColor: colors.hairline,
-  },
-  back: { flexDirection: 'row', alignItems: 'center', gap: space(0.5), minHeight: 36 },
   loading: { ...StyleSheet.absoluteFill, top: 80, alignItems: 'center', justifyContent: 'center', gap: space(2) },
 });
