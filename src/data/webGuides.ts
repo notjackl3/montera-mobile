@@ -12,12 +12,10 @@ export const WEB_URL = (process.env.EXPO_PUBLIC_WEB_URL ?? 'https://montera-nine
 
 export type WebGuide = { id: string; name: string; steps: number; study?: boolean };
 
-/** The web app's hand-made guides (src/data/products.ts there). */
+/** The web app's hand-made guides (src/data/products.ts there), the study build first. */
 export const WEB_GUIDES: WebGuide[] = [
-  { id: 'hutten-mini-1', name: 'HUTTEN mini 1 of 3, bottom shelf', steps: 8, study: true },
-  { id: 'hutten-mini-2', name: 'HUTTEN mini 2 of 3, middle shelf', steps: 8, study: true },
-  { id: 'hutten-mini-3', name: 'HUTTEN mini 3 of 3, top shelf', steps: 8, study: true },
-  { id: 'hutten', name: 'HUTTEN wine rack, 9 bottles', steps: 9 },
+  // The study build: the whole rack.
+  { id: 'hutten', name: 'HUTTEN wine rack, 9 bottles', steps: 9, study: true },
   { id: 'lack', name: 'LACK side table', steps: 4 },
   { id: 'lack-coffee', name: 'LACK coffee table', steps: 8 },
   { id: 'lack-tv', name: 'LACK TV bench', steps: 10 },
