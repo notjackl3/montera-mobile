@@ -283,3 +283,15 @@ src/
 - Real-size drawings depend on the bank-card calibration; device DPI is not used.
 - State is in memory only. Progress and sessions reset when the app is reloaded, and **Reset demo data** in Study mode restores the seeded set deliberately.
 - Drawers and doors are rendered as faces rather than opening assemblies.
+
+## Open it on a phone
+
+Install **Expo Go**, then from this folder run:
+
+```
+npx expo start --tunnel ngrok
+```
+
+and scan the QR code with the iPhone Camera (Android: Expo Go → Scan QR code). The tunnel works from any
+network and needs no Expo login. Plain `npx expo start` only works when the phone and the computer share a
+network that lets devices talk to each other (campus Wi-Fi often doesn't).
