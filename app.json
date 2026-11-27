@@ -17,7 +17,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.montera.mobile",
       "infoPlist": {
-        "NSCameraUsageDescription": "MONTERA uses the camera to scan IKEA article numbers, flat-pack boxes, manual pages and loose hardware so it can open the right 3D assembly guide."
+        "NSCameraUsageDescription": "MONTERA uses the camera to scan IKEA article numbers, flat-pack boxes, manual pages and loose hardware so it can open the right 3D assembly guide.",
+        "NSMicrophoneUsageDescription": "MONTERA listens for voice commands like “Hey IKEA, next step” so you can build with your hands full.",
+        "NSSpeechRecognitionUsageDescription": "MONTERA turns what you say into commands like “next” or “go back”, so you can build with your hands full."
       }
     },
     "android": {
