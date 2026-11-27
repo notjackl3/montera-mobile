@@ -15,7 +15,7 @@ export type WebGuide = { id: string; name: string; steps: number; study?: boolea
 /** The web app's hand-made guides (src/data/products.ts there), the study build first. */
 export const WEB_GUIDES: WebGuide[] = [
   // The study build: the whole rack.
-  { id: 'hutten', name: 'HUTTEN wine rack, 9 bottles', steps: 9, study: true },
+  { id: 'hutten', name: 'HUTTEN wine rack, 9 bottles', steps: 14, study: true },
   { id: 'lack', name: 'LACK side table', steps: 4 },
   { id: 'lack-coffee', name: 'LACK coffee table', steps: 8 },
   { id: 'lack-tv', name: 'LACK TV bench', steps: 10 },
