@@ -120,7 +120,8 @@ const seedSessions = (): Session[] => [
 ];
 
 export const useApp = create<State>((set, get) => ({
-  progress: { 'billy-bookcase': { step: 3, updatedAt: now() - 7_200_000 } },
+  // No seeded build in progress: Continue only ever shows a build someone really started (the study build is HUTTEN).
+  progress: {},
   recents: ['billy-bookcase', 'lack-side-table', 'kallax-2x2'],
   sessions: seedSessions(),
   active: undefined,
@@ -184,7 +185,7 @@ export const useApp = create<State>((set, get) => ({
 
   resetDemo: () =>
     set({
-      progress: { 'billy-bookcase': { step: 3, updatedAt: now() - 7_200_000 } },
+      progress: {},
       webProgress: {},
       recents: ['billy-bookcase', 'lack-side-table', 'kallax-2x2'],
       sessions: seedSessions(),

@@ -113,10 +113,11 @@ describe('seeded demo data', () => {
 
   // The home screen's "Continue building" card reads this straight into the
   // build player; an out-of-range step would open on an undefined step.
-  it('seeds a resumable build that points at a real step of a real guide', () => {
+  // No fake build in progress: Continue must only ever show a build someone really started.
+  it('seeds no build in progress, and any resumable build points at a real step', () => {
     const { progress } = useApp.getState();
     const entries = Object.entries(progress);
-    expect(entries.length).toBeGreaterThan(0);
+    expect(entries).toHaveLength(0);
     for (const [id, p] of entries) {
       const guide = getGuide(id);
       expect(guide, `${id} is resumable but has no guide`).toBeDefined();
