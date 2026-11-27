@@ -102,23 +102,48 @@ export default function ProductDetail() {
           </Text>
         </View>
 
-        {/* Actions */}
-        <View style={{ paddingHorizontal: space(4), marginTop: space(5), gap: space(2.5) }}>
+        {/* Actions. A2 F-07: "start" and "already partway" never look alike.
+            Start is the one filled blue button; partway is an outlined row with a
+            different icon and a sublabel saying what it does. */}
+        <View style={{ paddingHorizontal: space(4), marginTop: space(5), gap: space(3) }}>
           {product.tier === 'full' ? (
-            <Button
-              label={progress ? `Resume at step ${progress.step + 1}` : `Start building ${product.name}`}
-              icon={progress ? 'play' : 'construct'}
-              onPress={() => router.push(`/build/${product.id}`)}
-            />
+            <>
+              <Button
+                label={progress ? `Continue at step ${progress.step + 1}` : 'Start new build'}
+                icon={progress ? 'play' : 'construct'}
+                onPress={() => router.push(`/build/${product.id}`)}
+              />
+              <Pressable
+                onPress={() => router.push({ pathname: '/partway', params: { product: product.id } })}
+                style={({ pressed }) => [s.partway, pressed && { backgroundColor: colors.surfacePressed }]}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  progress
+                    ? 'On a different step? Pick the step you are on'
+                    : "I'm already partway. Pick the step you are on"
+                }
+              >
+                <Ionicons name="git-commit-outline" size={24} color={colors.ink} />
+                <View style={{ flex: 1 }}>
+                  <Text style={[type.heading, { color: colors.text }]}>
+                    {progress ? 'On a different step?' : "I'm already partway"}
+                  </Text>
+                  <Text style={[s.sub, { color: colors.textDim }]}>Pick the step you are on. The guide opens there.</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={22} color={colors.ink} />
+              </Pressable>
+            </>
           ) : (
             <Button label="No guide authored yet" icon="lock-closed-outline" disabled />
           )}
-          <Button
-            label="Open 3D viewer"
-            icon="cube-outline"
-            variant="secondary"
+          <Pressable
             onPress={() => router.push(`/viewer/${product.id}`)}
-          />
+            style={s.link}
+            accessibilityRole="link"
+          >
+            <Ionicons name="cube-outline" size={20} color={colors.blue} />
+            <Text style={[s.sub, { color: colors.blue, textDecorationLine: 'underline' }]}>Look around the 3D model</Text>
+          </Pressable>
         </View>
 
         {/* Specs */}
@@ -219,6 +244,19 @@ export default function ProductDetail() {
 }
 
 const s = StyleSheet.create({
+  partway: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space(3),
+    minHeight: 72,
+    padding: space(3),
+    borderWidth: 1,
+    borderColor: colors.ink,
+    borderRadius: radius.lg,
+    backgroundColor: colors.canvas,
+  },
+  sub: { fontSize: 16, lineHeight: 22, fontFamily: type.body.fontFamily },
+  link: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space(2), minHeight: 48 },
   heroTop: {
     position: 'absolute',
     top: 0,
