@@ -14,6 +14,9 @@ type ProgressMsg =
   | { type: 'montera-progress'; product: string; name: string; step: number; total: number; finished: boolean }
   | { type: 'montera-home' };
 
+/** Reports what the in-app browser supports for voice, to the Metro log. */
+const DIAG = `(function(){try{var w=window;w.ReactNativeWebView.postMessage(JSON.stringify({type:'montera-diag',sr:!!(w.SpeechRecognition||w.webkitSpeechRecognition),synth:'speechSynthesis' in w,voices:(w.speechSynthesis&&w.speechSynthesis.getVoices().length)||0,secure:w.isSecureContext,media:!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia),ua:navigator.userAgent}))}catch(e){}})();true;`;
+
 /**
  * The build itself: the web app's phone layout (3D step player, parts, checks,
  * voice), full screen under a thin bar that goes back to this app's home.
@@ -53,6 +56,10 @@ export default function GuideScreen() {
     } catch {
       return;
     }
+    if ((msg as { type?: string })?.type === 'montera-diag') {
+      console.log('[montera-diag]', JSON.stringify(msg));
+      return;
+    }
     if (msg?.type === 'montera-home') {
       leave();
       return;
@@ -89,6 +96,7 @@ export default function GuideScreen() {
           source={{ uri }}
           style={s.fill}
           onMessage={onMessage}
+          injectedJavaScript={DIAG}
           onLoadEnd={() => setLoading(false)}
           onError={() => setFailed(true)}
           // Voice: step clips play without a tap after the first one, the mic runs in the page.
